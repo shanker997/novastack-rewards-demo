@@ -38,18 +38,29 @@ The website's **Request a CRM discovery session → Open the discovery request**
 
 The qualified-only link is available under **Presenter notes** for the comparison test. A New referral can increase that campaign's referral count while its reward remains zero. Use a different fictional company/contact and `.example` email for each native-form submission, then verify its resulting status and amount in both portals. The native form follows the account's notification settings.
 
-Parent-observed verification before this website update: standard CPL submission **Marlowe Ridge Consulting** showed one referral and USD 15 for the provider / GBP 11.34 for the partner. Qualified-only submission **Fenwick Studio Group** showed one New referral and zero reward on both sides. Qualification and subsequent calculation are separate checks; this document does not claim that later test passed.
+Portal verification on 16 November 2026: standard CPL submission **Marlowe Ridge Consulting** showed one referral and USD 15 for the provider / GBP 11.34 for the partner. Qualified-only submission **Fenwick Studio Group** showed zero reward while New, then USD 25 / GBP 18.90 after the same referral became Qualified. An identical repeat submission created another referral rather than being deduplicated; that duplicate was marked Unqualified. The reward rules do not replace duplicate review.
 
 The readiness-plan download is independent, local, and ungated. It does not create a lead or call any tracking action.
 
-## Suggested campaign destinations
+## Campaign destinations
 
-- CPC: site root, `#approach`, or `#readiness`, according to the campaign story.
-- Workshop CPA: `#workshop`.
-- Sandbox CPA: `#sandbox`.
+Recommended destinations for new campaigns are listed below. The existing live workshop and sandbox campaigns still retain their fragment destinations because their Destination URL fields are disabled.
+
+- CPC: `https://shanker997.github.io/novastack-rewards-demo/`.
+- Workshop CPA: `https://shanker997.github.io/novastack-rewards-demo/`.
+- Sandbox CPA: `https://shanker997.github.io/novastack-rewards-demo/`.
+- QA-only CPA: `https://shanker997.github.io/novastack-rewards-demo/`.
 - Discovery CTA: `#discovery` (inside the readiness section); its button navigates to the native standard CPL form.
 
-Keep the landing page shared across campaigns. Start a verification run using the partner's generated tracking link, not the direct website URL.
+Use the shared site root, without a `#fragment`, in the configured CPA campaign destination. Keep the website's internal section navigation intact: after arriving through the generated partner link, use the workshop or sandbox buttons to reach the relevant action.
+
+Live testing found that a configured destination ending in `#workshop` or `#sandbox` redirected with attribution parameters after the fragment, for example `/#workshop?urlCode=…&aid=…&fid=…`. Completing the valid action then showed one click but zero actions and zero reward in the provider campaign. A QA-only CPA configured with the root URL placed the attribution parameters in the query string and recorded one event with a USD 0.01 reward. Destination URL is disabled in the live campaign editor, so the existing campaign URLs were not changed.
+
+This revision adds a synchronous compatibility step **before the unchanged provider tracking loader**. For the known `workshop`, `sandbox`, and `approach` anchors, it moves a complete `urlCode` / `aid` / `fid` tuple from the fragment into the ordinary query string and retains the section anchor. It uses same-origin `history.replaceState`, with no navigation, network request, invented attribution or tracking action. Unrelated existing query text is preserved. If any attribution key already exists in the ordinary query, the URL is left untouched to avoid mixing two campaigns. Unknown anchors, incomplete or duplicate tuples, extra keys and malformed percent escapes are also left untouched.
+
+The compatibility change has passed local tests only. Publication and fresh workshop/sandbox attribution checks in both portals are still required; do not treat a local confirmation as a verified reward. Keep the existing partner links for the retest and reset local demo actions before completing each action.
+
+Start every attribution verification run using the partner's generated tracking link, not the direct website URL. Internal `#workshop` and `#sandbox` navigation is safe to retain because it preserves the query string already supplied by the correctly configured campaign redirect.
 
 ## Privacy and demonstration boundaries
 
@@ -65,6 +76,7 @@ Before publication, verify HTML structure and JavaScript syntax. After publicati
 
 - HTML parser: unique IDs; all in-page links and label targets resolve.
 - JavaScript syntax: passed with the local Node runtime.
+- URL compatibility: 25 local cases passed, including both observed malformed URLs, normal URLs, idempotence, collision protection, unrelated query preservation, encoded values, malformed/duplicate tuples and history API failure. The exact provider loader is unchanged and follows the normalization step. Run `node test-campaign-url.cjs` from this directory.
 - Mock-DOM logic checks: no attribution on load; invalid registration is blocked; exact action IDs; duplicate guard; reset; incorrect field mapping feedback; asynchronous and synchronous tracking failure; retry after failure; missing-tracker messaging; and independent download behavior. These checks do not prove remote tracking.
 - Parent verified the original site's desktop layout, registration validation, mapping-error handling, three-step sandbox, download, and reset at `https://shanker997.github.io/novastack-rewards-demo/` after commit `5359eac763c55985bdd3c459e09d508b1f906188`. Browser console warnings/errors were absent. That organic-URL run did not establish campaign attribution.
-- This native-CPL website revision still needs publication and a live CTA check. The native CPL form behavior was separately verified by the parent as described above.
+- The native-CPL revision was published at HTML commit `daa9d447bf7d794898af7887e473f304c268d38b`; both exact native-form links and tracking availability were verified on the live website. The subsequent URL compatibility revision still needs publication and remote CPA retesting.
