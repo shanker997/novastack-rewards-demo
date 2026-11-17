@@ -6,6 +6,36 @@
   <meta name="description" content="Explore a fictional NovaStack CRM migration experience, register for a demo workshop, and build your readiness plan.">
   <meta name="robots" content="noindex,nofollow">
   <title>NovaStack — A clearer path to your next CRM</title>
+  <script id="normalize-campaign-url">
+    // Live campaign URLs are immutable. Repair the observed query-after-anchor
+    // redirect before the provider's tracking script reads the URL.
+    (() => {
+      try {
+        const url = new URL(window.location.href);
+        if (!['https:', 'http:'].includes(url.protocol)) return;
+        const fragment = url.hash.slice(1);
+        const queryStart = fragment.indexOf('?');
+        if (queryStart < 0) return;
+        const anchor = fragment.slice(0, queryStart);
+        if (!['workshop', 'sandbox', 'approach'].includes(anchor)) return;
+        const rawQuery = fragment.slice(queryStart + 1);
+        if (!rawQuery || /[?#]/.test(rawQuery) || /%(?![\da-f]{2})/i.test(rawQuery)) return;
+        const trackingKeys = ['urlCode', 'aid', 'fid'];
+        const fragmentParams = new URLSearchParams(rawQuery);
+        const entries = [...fragmentParams];
+        if (entries.length !== trackingKeys.length) return;
+        if (!trackingKeys.every(key => fragmentParams.getAll(key).length === 1 && fragmentParams.get(key).trim())) return;
+        // Never combine attribution from two URLs, even when just one normal
+        // query parameter is already present. The existing query wins unchanged.
+        if (trackingKeys.some(key => url.searchParams.has(key))) return;
+        url.search = url.search ? url.search + '&' + rawQuery : '?' + rawQuery;
+        url.hash = anchor;
+        window.history.replaceState(window.history.state, '', url.href);
+      } catch (_) {
+        // A restricted history API must not prevent the local demo or loader.
+      }
+    })();
+  </script>
   <script>(function(w,d,s,u){let j=d.createElement(s);j.async=true;j.src="https://assets.channels.appventory.com/scripts/cts.js?uid=" + u;let f=d.getElementsByTagName(s)[0];f.parentNode.insertBefore(j,f);})(window,document,"script","41d3be53-08c8-496c-ba31-6d3455d02511");</script>
   <style>
     :root{--ink:#113438;--muted:#597174;--teal:#067b75;--deep:#073e43;--mint:#c5f4df;--paper:#f5f6ef;--line:#d8e3dc;--white:#fff;--gold:#ffda8c;--radius:22px;--shadow:0 20px 65px #092d3210;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:var(--paper);font-synthesis:none}
